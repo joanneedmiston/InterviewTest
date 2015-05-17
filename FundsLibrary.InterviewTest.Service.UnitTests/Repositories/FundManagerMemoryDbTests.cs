@@ -75,5 +75,77 @@ namespace FundsLibrary.InterviewTest.Service.UnitTests.Repositories
             var afterCount = (await repo.GetAll()).Count();
             Assert.That(afterCount, Is.EqualTo(beforeCount - 1));
         }
+
+        [Test]
+        public async Task ShouldGetFirstPageDataUnsorted()
+        {
+            var repo = new FundManagerMemoryDb();
+
+            var testFundManagers = (await repo.GetAll()).ToList();
+            var allRowsCount = testFundManagers.Count();
+            var pageSize = allRowsCount - 1;
+
+            var result = await repo.GetPageData(pageSize, 1);
+
+            Assert.That(result.TotalRowCount, Is.EqualTo(allRowsCount));
+            Assert.That(result.PageRows.Count(), Is.EqualTo(pageSize));
+            Assert.That(result.PageRows.First().Id, Is.EqualTo(testFundManagers.First().Id));
+            Assert.That(result.PageRows.Last().Id, Is.EqualTo(testFundManagers[pageSize - 1].Id));
+
+        }
+
+        [Test]
+        public async Task ShouldGetLastPageDataUnsorted()
+        {
+            var repo = new FundManagerMemoryDb();
+
+            var testFundManagers = (await repo.GetAll()).ToList();
+            var allRowsCount = testFundManagers.Count();
+            var pageSize = allRowsCount - 1;
+
+            var result = await repo.GetPageData(pageSize, 2);
+
+            Assert.That(result.TotalRowCount, Is.EqualTo(allRowsCount));
+            Assert.That(result.PageRows.Count(), Is.EqualTo(1));
+            Assert.That(result.PageRows.First().Id, Is.EqualTo(testFundManagers.Last().Id));
+
+        }
+
+        [Test]
+        public async Task ShouldGetFirstPageDataSortedAscending()
+        {
+            var repo = new FundManagerMemoryDb();
+
+            var testFundManagers = (await repo.GetAll()).OrderBy(f => f.Name).ToList();
+            var allRowsCount = testFundManagers.Count();
+            var pageSize = allRowsCount - 1;
+
+            var result = await repo.GetPageData(pageSize, 1, "Name");
+
+            Assert.That(result.TotalRowCount, Is.EqualTo(allRowsCount));
+            Assert.That(result.PageRows.Count(), Is.EqualTo(pageSize));
+            Assert.That(result.PageRows.First().Id, Is.EqualTo(testFundManagers.First().Id));
+            Assert.That(result.PageRows.Last().Id, Is.EqualTo(testFundManagers[pageSize - 1].Id));
+
+        }
+
+        [Test]
+        public async Task ShouldGetFirstPageDataSortedDescending()
+        {
+            var repo = new FundManagerMemoryDb();
+
+            var testFundManagers = (await repo.GetAll()).OrderByDescending(f => f.ManagedSince).ToList();
+            var allRowsCount = testFundManagers.Count();
+            var pageSize = allRowsCount - 1;
+
+            var result = await repo.GetPageData(pageSize, 1, "ManagedSince", false);
+
+            Assert.That(result.TotalRowCount, Is.EqualTo(allRowsCount));
+            Assert.That(result.PageRows.Count(), Is.EqualTo(pageSize));
+            Assert.That(result.PageRows.First().Id, Is.EqualTo(testFundManagers.First().Id));
+            Assert.That(result.PageRows.Last().Id, Is.EqualTo(testFundManagers[pageSize - 1].Id));
+
+        }
+
     }
 }

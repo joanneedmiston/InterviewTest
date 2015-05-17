@@ -13,11 +13,12 @@ namespace FundsLibrary.InterviewTest.Common
 
     public enum Location
     {
-        London,
-        Amsterdam,
-        NewYork,
-        Frankfurt,
-        Luxembourg,
-        Zurich
+        Amsterdam = 1,
+        Frankfurt = 2,
+        London = 3,
+        Luxembourg = 4,
+        NewYork = 5,
+        Zurich = 6
     }
+
 }

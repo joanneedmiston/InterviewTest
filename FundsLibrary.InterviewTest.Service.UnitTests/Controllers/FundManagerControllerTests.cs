@@ -39,5 +39,45 @@ namespace FundsLibrary.InterviewTest.Service.UnitTests.Controllers
 
             Assert.That(result.Count(), Is.EqualTo(1));
         }
+
+
+        [Test]
+        public async Task ShouldGetPageDataUnsorted()
+        {
+            var mock = new Mock<IFundManagerRepository>();
+            var controller = new FundManagerController(mock.Object);
+            var pageData = new PageData<FundManager>
+            {
+                TotalRowCount = 4,
+                PageRows = new[] { new FundManager(), new FundManager(), new FundManager() }.AsQueryable()
+            };
+
+            mock.Setup(m => m.GetPageData(3, 1, null, true)).Returns(Task.FromResult(pageData));
+
+            var result = await controller.Get(3, 1);
+
+            Assert.That(result.TotalRowCount, Is.EqualTo(4));
+            Assert.That(result.PageRows.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public async Task ShouldGetPageDataSorted()
+        {
+            var mock = new Mock<IFundManagerRepository>();
+            var controller = new FundManagerController(mock.Object);
+            var pageData = new PageData<FundManager>
+            {
+                TotalRowCount = 4,
+                PageRows = new[] { new FundManager(), new FundManager(), new FundManager() }.AsQueryable()
+            };
+
+            mock.Setup(m => m.GetPageData(3, 1, "Name", false)).Returns(Task.FromResult(pageData));
+
+            var result = await controller.Get(3, 1, "Name", false);
+
+            Assert.That(result.TotalRowCount, Is.EqualTo(4));
+            Assert.That(result.PageRows.Count(), Is.EqualTo(3));
+        }
+
     }
 }

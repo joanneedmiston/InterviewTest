@@ -46,6 +46,49 @@ namespace FundsLibrary.InterviewTest.Service.Repositories
             return Task.FromResult(_fundManagers.Values.AsQueryable());
         }
 
+        public Task<PageData<FundManager>> GetPageData(int pageSize = 0, int pageNo = 0,
+    string orderByField = null, bool ascending = true)
+        {
+            var query = _fundManagers.Values.AsQueryable();
+            var pageData = new PageData<FundManager>()
+            {
+                TotalRowCount = query.Count()
+            };
+
+            switch (orderByField)
+            {
+                case "Id":
+                    query = ascending ? query.OrderBy(f => f.Id) : query.OrderByDescending(f => f.Id);
+                    break;
+                case "Name":
+                    query = ascending ? query.OrderBy(f => f.Name) : query.OrderByDescending(f => f.Name);
+                    break;
+                case "ManagedSince":
+                    query = ascending ? query.OrderBy(f => f.ManagedSince) : query.OrderByDescending(f => f.ManagedSince);
+                    break;
+                case "Biography":
+                    query = ascending ? query.OrderBy(f => f.Biography) : query.OrderByDescending(f => f.Biography);
+                    break;
+                case "Location":
+                    query = ascending ? query.OrderBy(f => f.Location) : query.OrderByDescending(f => f.Location);
+                    break;
+                default:
+                    // need apply OrderyBy for paging to work
+                    query = query.OrderBy(f => true);
+                    break;
+            }
+
+
+            if (pageSize > 0 && pageNo > 0)
+            {
+                query = query.Skip((pageNo - 1) * pageSize).Take(pageSize);
+            }
+
+            pageData.PageRows = query.AsQueryable();
+
+            return Task.FromResult(pageData);
+        }
+
         public void Update(Guid id, FundManager fundManager)
         {
             _fundManagers[id] = fundManager;

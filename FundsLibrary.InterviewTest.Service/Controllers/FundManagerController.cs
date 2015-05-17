@@ -26,6 +26,12 @@ namespace FundsLibrary.InterviewTest.Service.Controllers
             return await _repository.GetAll();
         }
 
+        public async Task<PageData<FundManager>> Get(int pageSize, int pageNo, string orderByField = null, bool ascending = true)
+        {
+            return await _repository.GetPageData(pageSize, pageNo, orderByField, ascending);
+        }
+
+
         // GET: api/FundManager/79c74c79-f993-454e-a7d4-53791f17f179
         public async Task<FundManager> Get(Guid id)
         {

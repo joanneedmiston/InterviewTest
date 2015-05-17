@@ -1,14 +1,47 @@
-﻿@model IEnumerable<FundsLibrary.InterviewTest.Web.Models.FundManagerModel>
+﻿@model FundsLibrary.InterviewTest.Web.ViewModels.FundManagerPagedDataViewModel
+@using FundsLibrary.InterviewTest.Web.HtmlHelpers;
 
 <div class="fund-managers">
     <h1>Fund managers</h1>
 
-    @foreach (var fundManager in Model)
-    {
-        <div class="fund-manager">
-            <span class="glyphicon glyphicon-user"></span>
-            @Html.ActionLink(fundManager.Name, "Details", new { Id = fundManager.Id })
-        </div>
-    }
+    <table>
+        <tr>
+            <th>
+                @Html.ActionLink("Name", "Index", new { orderByField = "Name", ascending = (ViewBag.CurrentOrderByField != "Name" || !ViewBag.CurrentOrderAscending) })
+            </th>
+            <th>
+                @Html.ActionLink("Location", "Index", new { orderByField = "Location", ascending = (ViewBag.CurrentOrderByField != "Location" || !ViewBag.CurrentOrderAscending) })
+            </th>
+            <th>
+                @Html.ActionLink("Managed Since", "Index", new { orderByField = "ManagedSince", ascending = (ViewBag.CurrentOrderByField != "ManagedSince" || !ViewBag.CurrentOrderAscending) })
+            </th>
+            <th></th>
+        </tr>
+        @foreach (var fundManager in Model.PageRows)
+        {
+            <tr>
+                <td>
+                    @fundManager.Name
+                </td>
+                <td>
+                    @fundManager.Location
+                </td>
+                <td>
+                    @fundManager.ManagedSince
+                </td>
+                <td>
+                    <div class="fund-manager">
+                        <span class="glyphicon glyphicon-user"></span>
+                        @Html.ActionLink("Details", "Details", new { Id = fundManager.Id })
+                    </div>
+                </td>
+            </tr>
+        }
+    </table>
+
+    <div class="pager">
+        @Html.PageLinks(Model.PageCount, Model.PageNumber, x => Url.Action("Index", new { page = x, orderByField = ViewBag.CurrentOrderByField, ascending = ViewBag.CurrentOrderAscending }))
+    </div>
+
 </div>
 

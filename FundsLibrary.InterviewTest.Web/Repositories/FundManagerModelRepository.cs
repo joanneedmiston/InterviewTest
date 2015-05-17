@@ -11,6 +11,8 @@ namespace FundsLibrary.InterviewTest.Web.Repositories
     public interface IFundManagerModelRepository
     {
         Task<IEnumerable<FundManagerModel>> GetAll();
+        Task<PageData<FundManagerModel>> GetPageData(int pageSize = 0, int pageNo = 0,
+             string orderByField = null, bool ascending = true);
         Task<FundManagerModel> Get(Guid id);
     }
 
@@ -35,10 +37,32 @@ namespace FundsLibrary.InterviewTest.Web.Repositories
             return managers.Select(s => _toModelMapper.Map(s));
         }
 
+        public async Task<PageData<FundManagerModel>> GetPageData(int pageSize = 0, int pageNo = 0,
+            string orderByField = null, bool ascending = true)
+        {
+            var url = string.Format("api/FundManager/?pageSize={0}&pageNo={1}", pageSize, pageNo);
+            if (orderByField != null)
+            {
+                url += string.Format("&orderByField={0}&ascending={1}", orderByField, ascending);
+            }
+
+            var sourcePageData = await _client.GetAndReadFromContentGetAsync<PageData<FundManager>>(url);
+
+            var pageData = new PageData<FundManagerModel>()
+            {
+                TotalRowCount = sourcePageData.TotalRowCount,
+                PageRows = sourcePageData.PageRows.Select(f => _toModelMapper.Map(f))
+            };
+
+            return pageData;
+
+        }
+
+
         public async Task<FundManagerModel> Get(Guid id)
         {
             var manager = await _client.GetAndReadFromContentGetAsync<FundManager>("api/FundManager/" + id);
-            return _toModelMapper.Map(manager);
+            return manager != null ? _toModelMapper.Map(manager) : null;
         }
     }
 }
